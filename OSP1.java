@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.*;
 
+//Note: All operations need to take place within 'while' loop reading from the file - handles everything one line at a time.
 public class OSP1
 {
 	public static Queue disk = new LinkedList();
@@ -9,8 +10,14 @@ public class OSP1
 	so something like "line = bufferedReader.readLine() -> J_SCHED(line)". Think about moving the split string loop into here so it can treat each job uniquely and then categorize it accordingly.
 	Said categorizing needs to be an 'ordered job mix' between IO-bound, CPU-bound, and balanced job types. Professor shunted the responsibility of finding out what exactly that is for your system on you, so get it working
 	first, then optimize the mix.*/
-	public void J_SCHED()
+	public static void J_SCHED(String inputLine)
 	{
+		String[] tokens;
+		tokens = inputLine.split("\\s+"); //Splits string into array. Still need to convert to a numeric value to run checks.
+		System.out.println(tokens.length);
+		System.out.println(tokens[3]);
+		//for(String t : tokens)
+		//	System.out.println(t);
 		//Data structure for PCB needs to be defined.
 		//If a job is to be loaded, function needs to call mem_manager with the requested amount of memory, to check if it can be run.
 		//If mem_manager returns that a chunk of memory is available, load job into ready queue for J_DISPATCH to handle.
@@ -52,6 +59,20 @@ public class OSP1
 		//release, also does the obvious, and releases the memory held by the finished process (inner class function(?))
 		//Lastly, check_mem does exactly that: check to see if any of the requested memory is available. If so, call acquire. If not, tell J_SCHED to shunt it onto the disk for later consideration.
 		//Possible 4th: A check to see if all memory is taken. Only needs to be done once, so J_SCHED can kick off the whole job fiesta.
+		//Prrrrobably need to have this run in a loop to set all values to 'true' at initialization as a global variable, then can do everything that mem_manager needs it to do
+		//Need to uhhh, split memory memory into if statements. ex: job comes in with mem requirement of 20, it ticks the 'x> 18k, x <= 32k' statement, then the memory is checked to see if it has any room available in the 32k memory slots. If so, return that job should be put into ready queue and mark memory sector 'false'. If not, send back that job should be put on disk until memory is available.
+		
+		boolean[][] memoryArr = new boolean[7][];
+		memoryArr[0] = new boolean[4];
+		memoryArr[1] = new boolean[4];
+		memoryArr[2] = new boolean[6];
+		memoryArr[3] = new boolean[6];
+		memoryArr[4] = new boolean[1];
+		memoryArr[5] = new boolean[4];
+		memoryArr[6] = new boolean[1];
+		
+		
+		
 	}
 	
 	public static void main(String[] args)
@@ -66,16 +87,16 @@ public class OSP1
 			FileReader fileReader = new FileReader(filename);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			
-			for(int i = 0; i < 15; i++)
+			for(int i = 0; i < 1; i++)
 			{
 				if((line = bufferedReader.readLine()) != null)
 				{
-					disk.add(line);
-					tokens = line.split("	");
-					//J_SHCED(line);
+					//disk.add(line); - sdd to disk line
+					//System.out.println(disk.element()); - prints out top of queue
+					//disk.poll(); - removes item from top of stack. Needs to be used after job is shunted to either A.) Ready queue, or B.) Back of the disk.
+
+					J_SCHED(line);
 					
-					//for(String t : tokens) //splits line into array for processing. Order should always be: JOB ID, JOB CLASS, REQUESTED MEMORY, PROCESSING TIME
-					//	System.out.println(t);
 				}
 			}
 			bufferedReader.close();
@@ -93,7 +114,8 @@ public class OSP1
 		
 		for(Iterator<String> iterator = disk.iterator(); iterator.hasNext();) //This operation's purpose is to load a job from 'disk' when J_SCHED runs.
 		{//If job on top of queue can't be entered because its memory slot(s) are taken, punt it to the bottom of the queue and try the next one. 
-		 //If all 300 jobs on the disk are
+		 //If all 300 jobs on the disk are incompatible, tell J_SCHED to run J_DISPATCH.
+		 //If both ready queue and disk are full with an incoming line, immediately run J_DISPATCH to clear up some room.
 			String value = iterator.next();
 			System.out.println("This is from the Object -> string loop.");
 			System.out.println(value);
@@ -103,6 +125,6 @@ public class OSP1
 			//https://stackoverflow.com/questions/223918/iterating-through-a-collection-avoiding-concurrentmodificationexception-when-re
 		}
 		
-		System.out.println("The number of items entered is: " + count);
+		//System.out.println("The number of items entered is: " + count);
 	}
 }
