@@ -4,34 +4,6 @@ import java.util.*;
 //Note: All operations need to take place within 'while' loop reading from the file - handles everything one line at a time.
 public class OSP1
 {
-
-	public static Queue disk = new LinkedList();
-	public static int count = 0;
-	public static mem_manager manager = new mem_manager();
-	/*Job arrival routine. First routine system calls, handles incoming jobs. So need to have it be called at the beginning of each new line of the job list read - 
-	so something like "line = bufferedReader.readLine() -> J_SCHED(line)". Think about moving the split string loop into here so it can treat each job uniquely and then categorize it accordingly.
-	Said categorizing needs to be an 'ordered job mix' between IO-bound, CPU-bound, and balanced job types. Professor shunted the responsibility of finding out what exactly that is for your system on you, so get it working
-	first, then optimize the mix.*/
-	public static void J_SCHED(String inputLine)
-	{
-		String[] tokens;
-		tokens = inputLine.split("\\s+"); //Splits string into array. NEED to convert to int when used. Extra white space given by process, so #s are 1-4.
-		
-		manager.aquire(Integer.parseInt(tokens[3]));
-		//for(String t : tokens)
-		//	System.out.println(t);
-		//Data structure for PCB needs to be defined.
-		//If a job is to be loaded, function needs to call mem_manager with the requested amount of memory, to check if it can be run.
-		//If mem_manager returns that a chunk of memory is available, load job into ready queue for J_DISPATCH to handle.
-		//If mem_manager returns that the requested memory is NOT available, shunt job into 'disk' - some defined data structure that holds up to 300 held jobs.
-		//When considering a new job after memory comes in (IE: Whenever J_SCHED is called), priority is given to the jobs on the disk (run an 'isEmpty' on the disk to see if its empty).
-		//If memory is available, send disk job down and put new incoming job at the back of the line (FCFS/FIFO).
-		//If memory is NOT available, run standard protocol on newly arrived job
-		//If all memory is full, run J_DISPATCH and proceed with standard function for all situations
-		//If incoming job gives a 0 for...lets say the ID, then try to load EVERYTHING IT CAN from the disk in order to fill that memory hole in mem_manager, job mix be damned.
-		//So this requires a 2nd 'load' procedure that can run under these circumstances
-	}
-	
 	/*Job termination function. Documents and outputs job termination statistics, and purges the appropriate queues upon termination.*/
 	public void J_TERM()
 	{
@@ -53,12 +25,24 @@ public class OSP1
 		
 	}
 	
+	public static void initialize(boolean[][] input)
+	{
+		for(int i = 0; i < input.length; i++)
+		{
+			for(int j = 0; j < input[i].length; j++)
+			{
+				input[i][j] = true;
+			}
+		}
+	}
+	
 	public static void main(String[] args)
 	{
 		String filename = "18Sp-jobs";
 		String line, parsedLine;
 		String[] tokens;
-		mem_manager manager = new mem_manager();
+		int count = 0;
+		Queue disk = new LinkedList();
 		
 		boolean[][] memoryArr = new boolean[7][];
 		memoryArr[0] = new boolean[4];
@@ -68,6 +52,13 @@ public class OSP1
 		memoryArr[4] = new boolean[1];
 		memoryArr[5] = new boolean[4];
 		memoryArr[6] = new boolean[1];
+		
+		initialize(memoryArr);
+		//if(memoryArr[4][0] == true)
+			//System.out.println("I got initialized!");
+		mem_manager manager = new mem_manager(memoryArr);
+		J_SCHED sched = new J_SCHED();
+		
 		
 		//This chunk runs everything. J_SCHED runs first after the initial line is read in and sent to it.
 		try 
@@ -82,8 +73,7 @@ public class OSP1
 					//disk.add(line); - sdd to disk line
 					//System.out.println(disk.element()); - prints out top of queue
 					//disk.poll(); - removes item from top of stack. Needs to be used after job is shunted to either A.) Ready queue, or B.) Back of the disk.
-
-					J_SCHED(line);
+					sched.run(line);
 					
 				}
 			}
