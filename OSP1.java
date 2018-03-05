@@ -4,8 +4,10 @@ import java.util.*;
 //Note: All operations need to take place within 'while' loop reading from the file - handles everything one line at a time.
 public class OSP1
 {
+
 	public static Queue disk = new LinkedList();
 	public static int count = 0;
+	public static mem_manager manager = new mem_manager();
 	/*Job arrival routine. First routine system calls, handles incoming jobs. So need to have it be called at the beginning of each new line of the job list read - 
 	so something like "line = bufferedReader.readLine() -> J_SCHED(line)". Think about moving the split string loop into here so it can treat each job uniquely and then categorize it accordingly.
 	Said categorizing needs to be an 'ordered job mix' between IO-bound, CPU-bound, and balanced job types. Professor shunted the responsibility of finding out what exactly that is for your system on you, so get it working
@@ -13,9 +15,9 @@ public class OSP1
 	public static void J_SCHED(String inputLine)
 	{
 		String[] tokens;
-		tokens = inputLine.split("\\s+"); //Splits string into array. Still need to convert to a numeric value to run checks.
-		System.out.println(tokens.length);
-		System.out.println(tokens[3]);
+		tokens = inputLine.split("\\s+"); //Splits string into array. NEED to convert to int when used. Extra white space given by process, so #s are 1-4.
+		
+		manager.aquire(Integer.parseInt(tokens[3]));
 		//for(String t : tokens)
 		//	System.out.println(t);
 		//Data structure for PCB needs to be defined.
@@ -51,16 +53,12 @@ public class OSP1
 		
 	}
 	
-	public void mem_manager() //Subprogram keeping track of memory, think about shunting this off to its own page and granting main program access to it when running
+	public static void main(String[] args)
 	{
-		/*Keeps information on available memory for jobs. Should return a boolean value for 'yeah we got space', then occupy that space with some value that shows the process is running. Then, once process is done, J_TERM will be called on it to free up that space. Since the job ID is unique, should probably assign job ID to space to do a check. For the size 52K and 128K, can just tick a boolean/some value that says occupied until J_TERM is called on it since they only have the one space available. THINK ABOUT DOING INNER CLASSES FOR THIS ONE IF YOU DON'T WANNA MAKE MORE THAN 1 FILE. */
-		
-		//has three entries - acquire, which does the obvious and grabs the requested memory (inner class function(?))
-		//release, also does the obvious, and releases the memory held by the finished process (inner class function(?))
-		//Lastly, check_mem does exactly that: check to see if any of the requested memory is available. If so, call acquire. If not, tell J_SCHED to shunt it onto the disk for later consideration.
-		//Possible 4th: A check to see if all memory is taken. Only needs to be done once, so J_SCHED can kick off the whole job fiesta.
-		//Prrrrobably need to have this run in a loop to set all values to 'true' at initialization as a global variable, then can do everything that mem_manager needs it to do
-		//Need to uhhh, split memory memory into if statements. ex: job comes in with mem requirement of 20, it ticks the 'x> 18k, x <= 32k' statement, then the memory is checked to see if it has any room available in the 32k memory slots. If so, return that job should be put into ready queue and mark memory sector 'false'. If not, send back that job should be put on disk until memory is available.
+		String filename = "18Sp-jobs";
+		String line, parsedLine;
+		String[] tokens;
+		mem_manager manager = new mem_manager();
 		
 		boolean[][] memoryArr = new boolean[7][];
 		memoryArr[0] = new boolean[4];
@@ -70,16 +68,6 @@ public class OSP1
 		memoryArr[4] = new boolean[1];
 		memoryArr[5] = new boolean[4];
 		memoryArr[6] = new boolean[1];
-		
-		
-		
-	}
-	
-	public static void main(String[] args)
-	{
-		String filename = "18Sp-jobs";
-		String line, parsedLine;
-		String[] tokens;
 		
 		//This chunk runs everything. J_SCHED runs first after the initial line is read in and sent to it.
 		try 
@@ -121,8 +109,6 @@ public class OSP1
 			System.out.println(value);
 			count++;
 			iterator.remove();
-			//disk.poll(); - removing from queue during loop gives an exception. Need to use iterator in order to remove during loop over queue
-			//https://stackoverflow.com/questions/223918/iterating-through-a-collection-avoiding-concurrentmodificationexception-when-re
 		}
 		
 		//System.out.println("The number of items entered is: " + count);
