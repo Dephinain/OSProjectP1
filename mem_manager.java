@@ -3,14 +3,12 @@ import java.util.*;
 
 public class mem_manager
 {
-
 	public static boolean[][] workingArray;
 	
 	public mem_manager()
 	{
 	};
 	
-
 	public mem_manager(boolean[][] input)
 	{
 		//System.out.println("Now we're cookin with petrol.");
@@ -43,7 +41,7 @@ public class mem_manager
 				int limit = workingArray[0].length;
 				if(workingArray[1][i] == true)
 				{
-					System.out.println("SEND HELP");
+					System.out.println("SEND A NIGGA HELP");
 					workingArray[1][i] = false;
 					return true;
 					//break;
