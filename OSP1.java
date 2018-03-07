@@ -25,38 +25,14 @@ public class OSP1
 		
 	}
 	
-	public static void initialize(boolean[][] input)
-	{
-		for(int i = 0; i < input.length; i++)
-		{
-			for(int j = 0; j < input[i].length; j++)
-			{
-				input[i][j] = true;
-			}
-		}
-	}
-	
 	public static void main(String[] args)
 	{
 		String filename = "18Sp-jobs";
 		String line, parsedLine;
 		String[] tokens;
 		int count = 0;
+		String[] readyQueue;
 		Queue disk = new LinkedList();
-		
-		boolean[][] memoryArr = new boolean[7][];
-		memoryArr[0] = new boolean[4];
-		memoryArr[1] = new boolean[4];
-		memoryArr[2] = new boolean[6];
-		memoryArr[3] = new boolean[6];
-		memoryArr[4] = new boolean[1];
-		memoryArr[5] = new boolean[4];
-		memoryArr[6] = new boolean[1];
-		
-		initialize(memoryArr);
-		//if(memoryArr[4][0] == true)
-			//System.out.println("I got initialized!");
-		mem_manager manager = new mem_manager(memoryArr);
 		J_SCHED sched = new J_SCHED();
 		
 		
@@ -73,7 +49,15 @@ public class OSP1
 					//disk.add(line); - sdd to disk line
 					//System.out.println(disk.element()); - prints out top of queue
 					//disk.poll(); - removes item from top of stack. Needs to be used after job is shunted to either A.) Ready queue, or B.) Back of the disk.
-					sched.run(line);
+					if(sched.memoryCheck(line))
+					{
+						//shunts job to ready queue
+					}
+					else
+					{	
+						disk.add(line);
+						count++;
+					}
 					
 				}
 			}
@@ -87,8 +71,6 @@ public class OSP1
 		{
 			System.out.println("Error reading file.");
 		}
-//System.out.println(disk.element());
-		//disk.poll();
 		
 		for(Iterator<String> iterator = disk.iterator(); iterator.hasNext();) //This operation's purpose is to load a job from 'disk' when J_SCHED runs.
 		{//If job on top of queue can't be entered because its memory slot(s) are taken, punt it to the bottom of the queue and try the next one. 
@@ -97,10 +79,9 @@ public class OSP1
 			String value = iterator.next();
 			System.out.println("This is from the Object -> string loop.");
 			System.out.println(value);
-			count++;
 			iterator.remove();
 		}
 		
-		//System.out.println("The number of items entered is: " + count);
+		System.out.println("The number of items entered is: " + count);
 	}
 }
