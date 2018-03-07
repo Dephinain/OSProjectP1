@@ -25,6 +25,17 @@ public class OSP1
 		
 	}
 	
+	public static void initialize(boolean[][] input)
+	{
+		for(int i = 0; i < input.length; i++)
+		{
+			for(int j = 0; j < input[i].length; j++)
+			{
+				input[i][j] = true;
+			}
+		}
+	}
+	
 	public static void main(String[] args)
 	{
 		String filename = "18Sp-jobs";
@@ -33,6 +44,13 @@ public class OSP1
 		int count = 0;
 		String[] readyQueue;
 		Queue disk = new LinkedList();
+		J_SCHED sched = new J_SCHED();
+		
+		
+		initialize(memoryArr);
+		//if(memoryArr[4][0] == true)
+			//System.out.println("I got initialized!");
+		mem_manager manager = new mem_manager(memoryArr);
 		J_SCHED sched = new J_SCHED();
 		
 		
@@ -58,7 +76,6 @@ public class OSP1
 						disk.add(line);
 						count++;
 					}
-					
 				}
 			}
 			bufferedReader.close();
