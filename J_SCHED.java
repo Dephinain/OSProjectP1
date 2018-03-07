@@ -8,24 +8,51 @@ import java.util.*;
 	first, then optimize the mix.*/
 public class J_SCHED
 {
-	
-		public J_SCHED()
+
+		private void initialize(boolean[][] input)
 		{
+			for(int i = 0; i < input.length; i++)
+			{
+				for(int j = 0; j < input[i].length; j++)
+				{
+					input[i][j] = true;
+				}
+			}
+		}
+		
+		private static boolean[][] memoryArr = new boolean[7][];
+		
+		public J_SCHED()
+		{			
+			memoryArr[0] = new boolean[4];
+			memoryArr[1] = new boolean[4];
+			memoryArr[2] = new boolean[6];
+			memoryArr[3] = new boolean[6];
+			memoryArr[4] = new boolean[1];
+			memoryArr[5] = new boolean[4];
+			memoryArr[6] = new boolean[1];
+			initialize(memoryArr);
 		};
 		
-		public void run(String inputLine)
+		private static mem_manager manager = new mem_manager(memoryArr);
+		
+		public static boolean memoryCheck(String inputLine)
 		{
-			System.out.println("I got accessed!");
 			String[] tokens;
 			tokens = inputLine.split("\\s+");	
-			for(String t : tokens)
-				System.out.println(t);
-		}
-		//String[] tokens;
-		//tokens = inputLine.split("\\s+"); //Splits string into array. NEED to convert to int when used. Extra white space given by process, so #s are 1-4.
-		//manager.aquire(Integer.parseInt(tokens[3]));
-		//for(String t : tokens)
-		//	System.out.println(t);
+			//System.out.println(memoryArr[6][0]);
+			if(manager.aquire(Integer.parseInt(tokens[3])))
+			{
+				return true;
+			}
+			else
+				return false;
+		};
+		
+		public static boolean jobLoad(boolean input)
+		{
+			return false;
+		};
 		//Data structure for PCB needs to be defined. => array for ready queue, queue for disk
 		//If a job is to be loaded, function needs to call mem_manager with the requested amount of memory, to check if it can be run.
 		//If mem_manager returns that a chunk of memory is available, load job into ready queue for J_DISPATCH to handle.
