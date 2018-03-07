@@ -8,7 +8,6 @@ import java.util.*;
 	first, then optimize the mix.*/
 public class J_SCHED
 {
-
 		private void initialize(boolean[][] input)
 		{
 			for(int i = 0; i < input.length; i++)
@@ -53,6 +52,7 @@ public class J_SCHED
 		{
 			return false;
 		};
+		
 		//Data structure for PCB needs to be defined. => array for ready queue, queue for disk
 		//If a job is to be loaded, function needs to call mem_manager with the requested amount of memory, to check if it can be run.
 		//If mem_manager returns that a chunk of memory is available, load job into ready queue for J_DISPATCH to handle.
