@@ -35,10 +35,11 @@ public class J_SCHED
 		
 		private static mem_manager manager = new mem_manager(memoryArr);
 		
-		public static boolean memoryCheck(String inputLine)
+		public static boolean memoryCheck(String inputLine) //Note: tokens[1-5] represent the following: Job ID(1), class of Job(2), requested memory(3), processing time(4), arrival time(5).
 		{
 			String[] tokens;
 			tokens = inputLine.split("\\s+");	
+			//System.out.println(Integer.parseInt(tokens[5]));
 			if(manager.aquire(Integer.parseInt(tokens[3])))
 			{
 				return true;
@@ -55,13 +56,7 @@ public class J_SCHED
 				return true;
 			else
 				return false;
-		}
-		
-		public static boolean jobLoad(boolean input)
-		{
-			return false;
-		};
-		
+		}		
 		//Data structure for PCB needs to be defined. => array for ready queue, queue for disk
 		//If a job is to be loaded, function needs to call mem_manager with the requested amount of memory, to check if it can be run.
 		//If mem_manager returns that a chunk of memory is available, load job into ready queue for J_DISPATCH to handle.
