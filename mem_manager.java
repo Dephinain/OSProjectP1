@@ -11,9 +11,7 @@ public class mem_manager
 	
 	public mem_manager(boolean[][] input)
 	{
-		//System.out.println("Now we're cookin with petrol.");
 		this.workingArray = input;
-		//System.out.println(workingArray[4][0]);
 	};
 	
 	public static boolean aquire(int memoryNeed)
@@ -22,7 +20,6 @@ public class mem_manager
 		{
 			for(int i = 0; i < workingArray[0].length; i++)
 			{
-				int limit = workingArray[0].length;
 				if(workingArray[0][i] == true)
 				{
 					System.out.println("LEG DAY");
@@ -38,7 +35,6 @@ public class mem_manager
 		{
 			for(int i = 0; i < workingArray[1].length; i++)
 			{
-				int limit = workingArray[0].length;
 				if(workingArray[1][i] == true)
 				{
 					System.out.println("SEND ME HELP");
@@ -47,14 +43,15 @@ public class mem_manager
 					//break;
 				}
 				else
+				{
 					continue;
+				}
 			}
 		}
 		else if((memoryNeed > 12) && (memoryNeed <= 18))
 		{
 			for(int i = 0; i < workingArray[2].length; i++)
 			{
-				int limit = workingArray[0].length;
 				if(workingArray[2][i] == true)
 				{
 					System.out.println("YERR");
@@ -70,7 +67,6 @@ public class mem_manager
 		{
 			for(int i = 0; i < workingArray[3].length; i++)
 			{
-				int limit = workingArray[0].length;
 				if(workingArray[3][i] == true)
 				{
 					System.out.println("YEET");
@@ -82,9 +78,58 @@ public class mem_manager
 					continue;
 			}
 		}
+		else if((memoryNeed > 32) && (memoryNeed <= 52)) //Only has one slot - may need a stronger yes/no
+		{
+			for(int i = 0; i < workingArray[4].length; i++)
+			{
+				if(workingArray[4][i] == true)
+				{
+					System.out.println("TWERK");
+					workingArray[4][i] = false;
+					return true;
+				}
+				else
+					continue;
+			}
+		}
+		else if((memoryNeed > 52) && (memoryNeed <= 60))
+		{
+			for(int i = 0; i < workingArray[5].length; i++)
+			{
+				if(workingArray[5][i] == true)
+				{
+					System.out.println("SOMETHING");
+					workingArray[5][i] = false;
+					return true;
+				}
+				else
+					continue;
+			}
+		}
+		else if((memoryNeed > 60) && (memoryNeed <= 128))
+		{
+			for(int i = 0; i < workingArray[6].length; i++)
+			{
+				if(workingArray[6][i] == true)
+				{
+					System.out.println("SPECIAL");
+					workingArray[6][i] = false;
+					return true;
+				}
+				else
+					continue;
+			}
+		}
+		else if(memoryNeed > 128)
+		{
+			System.out.println("We have no room for this thing, what, get it outta here");
+			return false;
+		}
 		
 		return false;
 	};
+	
+	
 	
 	/*Keeps information on available memory for jobs. Should return a boolean value for 'yeah we got space', then occupy that space with some value that shows the process is running. Then, once process is done, J_TERM will be called on it to free up that space. Since the job ID is unique, should probably assign job ID to space to do a check. For the size 52K and 128K, can just tick a boolean/some value that says occupied until J_TERM is called on it since they only have the one space available. THINK ABOUT DOING INNER CLASSES FOR THIS ONE IF YOU DON'T WANNA MAKE MORE THAN 1 FILE. */
 		
