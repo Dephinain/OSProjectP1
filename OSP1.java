@@ -5,12 +5,15 @@ import java.util.*;
 public class OSP1
 {
 	/*Job termination function. Documents and outputs job termination statistics, and purges the appropriate queues upon termination.*/
-	public void J_TERM()
+	public void J_TERM(String finishedJob)
 	{
+		//String[] tokens;
+		//	tokens = finishedJob.split("\\s+");
+		//System.out.println("Job stats: ")
 		//The following information needs to be ouput: 
-		//Job ID
-		//Class of Job
-		//Time job was submitted to system
+		//Job ID - System.out.println("Job ID: " + tokens[1])
+		//Class of Job - System.out.println("Class of Job: " + tokens[2])
+		//Time job was submitted to system - System.out.println() etc
 		//Time job was loaded
 		//Time job was terminated
 		//Processing time
@@ -20,10 +23,14 @@ public class OSP1
 		
 	}
 	
-	/*When J_SCHED and J_TERM aren't running, this is. Handles the actual 'running' of a job. In a First Come, First Serve (FCFS) fashion, the address for the Process Control Block (PCB) next in line will get passed to this function. Passes the processing time to the CPU, which increments the clock by said processing time. After it is run (IE: time is processed), J_TERM will be called to output job stats and will remove the finished process from memory in order to make room for another process.*/
-	public void J_DISPATCH()
+	public void J_DISPATCH(String arrivingJob)
 	{
-		
+		//String[] tokens;
+		//	tokens = arrivingJob.split("\\s+");
+		//Thread.sleep(Integer.parseInt(tokens[4]));
+		//call J_TERM(arrivingJob);
+		//simulates CPU processing time by calling Thread.sleep(Integer.parseInt(tokens[4])
+		//After 'processing', calls J_TERM to terminate job and free up some memory
 	}
 	
 	public static void main(String[] args)
@@ -33,10 +40,12 @@ public class OSP1
 		File file = new File("18sp-jobs");
 		String line;
 		String[] tokens;
-		int count = 0;
-		ArrayList<String> readyQueue = new ArrayList<String>(26);
+		int count = 0, queueCount = 0;
+		final int qCONSTRAINT = 26;
+		ArrayList<String> readyQueue = new ArrayList<String>(qCONSTRAINT);
 		Queue<String> disk = new LinkedList<String>();
 		J_SCHED sched = new J_SCHED();
+		Date date = new Date();
 		
 		
 		//This chunk runs everything. J_SCHED runs first after the initial line is read in and sent to it.
@@ -45,11 +54,13 @@ public class OSP1
 			FileReader fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			
-			for(int i = 0; i < 5; i++)
+			for(int i = 0; i < 2000; i++) //May come into contact with an infinite loop bug when doing the 'while' conversion - be aware.
 			{
-				int queueCount = 0;
 				if((line = bufferedReader.readLine()) != null)
 				{
+					StringBuffer appendArrivalTime = new StringBuffer(line);
+					appendArrivalTime.append("	" + date.getSeconds());
+					line = appendArrivalTime.toString(); //appends arrival time to incoming job
 					if(disk.isEmpty() == false)
 					{
 						//System.out.println("This is the job that was just introduced, being put onto disk since there's a job at the top of the disk with priority: " + line);
@@ -58,25 +69,45 @@ public class OSP1
 						//System.out.println("This is the job that was popped off the top of the disk queue to be inserted into the ready queue: " + line);
 						//System.out.println("Incoming job has been replaced with job from disk and put at tail end of disk to await run.");
 					}
-					//Need to check: if disk has a job vs. the incoming job
-					if(sched.idCheck(line)) //checks if job id is 0, if so then calls J_DISPATCH to run.
+					if(sched.idCheck(line)) //checks if job id is 0, if so then fills ready queue from disk and calls J_DISPATCH to run.
 					{
-						//call J_DISPATCH to run job in ready queue and continue
+						System.out.println("0 encountered, so we're loading everything from the disk and running it until we get some new jobs");
+						for(int j = 0; j < qCONSTRAINT; j++)
+						{
+							if(sched.memoryCheck(disk.element()))
+							{
+								if(sched.idCheck(disk.element()))
+								{
+									System.out.println("Henlo");
+									disk.remove();
+								}
+								else
+								{
+									readyQueue.add(disk.remove());
+									System.out.println(readyQueue.size());
+								}
+							}
+							else
+							{	
+								disk.add(disk.remove());
+							}
+						}
+						//J_DISPATCH call
+						continue;
 					}
-					if(readyQueue.size() == 26) //Checks if the ready queue is full. If it is, calls J_DISPATCH to run.
+					if(readyQueue.size() == qCONSTRAINT) //Checks if the ready queue is full. If it is, calls J_DISPATCH to run.
 					{
-						//call J_DISPATCH to run job and continue
+						System.out.println("Queue is full, so we're ceasing activity to run J_DISPATCH");
+						break;
 					}
 					if(sched.memoryCheck(line))
 					{
-						System.out.println("This job is being put onto the readyqueue: " + line);
 						readyQueue.add(line);
-						System.out.println(Arrays.toString(readyQueue.toArray()));
+						//System.out.println(readyQueue.size());
 						queueCount++;
 					}
 					else
 					{	
-						System.out.println("Job being put onto disk since it fits no requirements: " + line);
 						disk.add(line);
 						count++;
 					}
@@ -99,11 +130,17 @@ public class OSP1
 		 //If all 300 jobs on the disk are incompatible, tell J_SCHED to run J_DISPATCH.
 		 //If both ready queue and disk are full with an incoming line, immediately run J_DISPATCH to clear up some room.
 			String value = iterator.next();
-			System.out.println("This is from the Object -> string loop.");
-			System.out.println(value);
+			//System.out.println("This is from the Object -> string loop.");
+			//System.out.println(value);
 			//iterator.remove();
 		}
 		
-		System.out.println("The number of items entered into the ready queue is: " + count);
+		System.out.println("The number of items entered into the disk is: " + count);
+		System.out.println("The number of items entered into the ready queue is " + readyQueue.size());
+		
+		/*for(int i = 0; i < readyQueue.size(); i++)
+		{
+			System.out.println(readyQueue.get(i));
+		}*/
 	}
 }
