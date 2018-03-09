@@ -41,7 +41,7 @@ public class mem_manager
 				int limit = workingArray[0].length;
 				if(workingArray[1][i] == true)
 				{
-					System.out.println("SEND A NIGGA HELP");
+					System.out.println("SEND ME HELP");
 					workingArray[1][i] = false;
 					return true;
 					//break;

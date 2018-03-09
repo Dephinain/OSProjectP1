@@ -16,6 +16,7 @@ public class OSP1
 		//Processing time
 		//Turnaround time
 		//Waiting time
+		//NOTE: Calls J_SCHED upon publishing
 		
 	}
 	
@@ -27,34 +28,55 @@ public class OSP1
 	
 	public static void main(String[] args)
 	{
-		String filename = "18Sp-jobs";
-		String line, parsedLine;
+		//String filename = "C:\Users\Larry\Desktop\18Sp-jobs";
+		//File file = new File("C:\\Users\\Larry\\Desktop\\18Sp-jobs"); Line used for CSX reading the file, other line is for testing on local machines
+		File file = new File("18sp-jobs");
+		String line;
 		String[] tokens;
 		int count = 0;
-		String[] readyQueue;
-		Queue disk = new LinkedList();
+		ArrayList<String> readyQueue = new ArrayList<String>(26);
+		Queue<String> disk = new LinkedList<String>();
 		J_SCHED sched = new J_SCHED();
 		
 		
 		//This chunk runs everything. J_SCHED runs first after the initial line is read in and sent to it.
 		try 
 		{
-			FileReader fileReader = new FileReader(filename);
+			FileReader fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			
-			for(int i = 0; i < 1; i++)
+			for(int i = 0; i < 5; i++)
 			{
+				int queueCount = 0;
 				if((line = bufferedReader.readLine()) != null)
 				{
-					//disk.add(line); - sdd to disk line
-					//System.out.println(disk.element()); - prints out top of queue
-					//disk.poll(); - removes item from top of stack. Needs to be used after job is shunted to either A.) Ready queue, or B.) Back of the disk.
+					if(disk.isEmpty() == false)
+					{
+						//System.out.println("This is the job that was just introduced, being put onto disk since there's a job at the top of the disk with priority: " + line);
+						disk.add(line);
+						line = disk.remove(); //No jobs from disk being put onto ready queue
+						//System.out.println("This is the job that was popped off the top of the disk queue to be inserted into the ready queue: " + line);
+						//System.out.println("Incoming job has been replaced with job from disk and put at tail end of disk to await run.");
+					}
+					//Need to check: if disk has a job vs. the incoming job
+					if(sched.idCheck(line)) //checks if job id is 0, if so then calls J_DISPATCH to run.
+					{
+						//call J_DISPATCH to run job in ready queue and continue
+					}
+					if(readyQueue.size() == 26) //Checks if the ready queue is full. If it is, calls J_DISPATCH to run.
+					{
+						//call J_DISPATCH to run job and continue
+					}
 					if(sched.memoryCheck(line))
 					{
-						//shunts job to ready queue
+						System.out.println("This job is being put onto the readyqueue: " + line);
+						readyQueue.add(line);
+						System.out.println(Arrays.toString(readyQueue.toArray()));
+						queueCount++;
 					}
 					else
 					{	
+						System.out.println("Job being put onto disk since it fits no requirements: " + line);
 						disk.add(line);
 						count++;
 					}
@@ -79,9 +101,9 @@ public class OSP1
 			String value = iterator.next();
 			System.out.println("This is from the Object -> string loop.");
 			System.out.println(value);
-			iterator.remove();
+			//iterator.remove();
 		}
 		
-		System.out.println("The number of items entered is: " + count);
+		System.out.println("The number of items entered into the ready queue is: " + count);
 	}
 }

@@ -39,7 +39,6 @@ public class J_SCHED
 		{
 			String[] tokens;
 			tokens = inputLine.split("\\s+");	
-			//System.out.println(memoryArr[6][0]);
 			if(manager.aquire(Integer.parseInt(tokens[3])))
 			{
 				return true;
@@ -47,6 +46,16 @@ public class J_SCHED
 			else
 				return false;
 		};
+		
+		public static boolean idCheck(String inputLine)
+		{
+			String[] tokens;
+			tokens = inputLine.split("\\s+");
+			if(Integer.parseInt(tokens[1]) == 0)
+				return true;
+			else
+				return false;
+		}
 		
 		public static boolean jobLoad(boolean input)
 		{
