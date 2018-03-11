@@ -2,28 +2,45 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.lang.*;
 
 //Note: All operations need to take place within 'while' loop reading from the file - handles everything one line at a time.
 public class OSP1
 {
 	public static J_SCHED sched = new J_SCHED();
+	public static int jobsProcessed;
+	public static int cpuJobCount, ioJobCount, balancedJobCount, totalTurnaround, totalWaitTime;
+	
 	/*Job termination function. Documents and outputs job termination statistics, and purges the appropriate queues upon termination.*/
 	public static void J_TERM(String finishedJob)
 	{
 		Date time = new Date();
+		long term_time = time.getTime();
+		long tat_time, wait_time;
 		String[] term_tokens;
 		term_tokens = finishedJob.split("\\s+");
+		tat_time = term_time - Long.parseLong(term_tokens[5]);
+		wait_time = term_time - Long.parseLong(term_tokens[4]) - Long.parseLong(term_tokens[4]);
+		if(Integer.parseInt(term_tokens[2]) == 1)
+			cpuJobCount++;
+		else if(Integer.parseInt(term_tokens[2]) == 2)
+			balancedJobCount++;
+		else if(Integer.parseInt(term_tokens[2]) == 3)
+			ioJobCount++;
+		
 		System.out.println("\nJob stats: ");
-		//The following information needs to be ouput: 
 		System.out.println("Job ID: " + term_tokens[1]);
 		System.out.println("Class of Job: " + term_tokens[2]);
-		System.out.println("Time job was submitted: " + term_tokens[5] + " seconds.");
-		System.out.println("Time job was loaded to ready queue: " + term_tokens[6] + " seconds.");
-		System.out.println("Time job was terminated: " + time.getSeconds());
+		System.out.println("Time job was submitted: " + term_tokens[5] + " milliseconds.");
+		System.out.println("Time job was loaded to ready queue: " + term_tokens[6] + " milliseconds.");
+		System.out.println("Time job was terminated: " + term_time);
 		System.out.println("Time job was spent processing: " + term_tokens[4] + " milliseconds.");
-		//Turnaround time - Termination time - Arrival time
-		//Waiting time - time from arrival to actually being loaded (Termination time - processing time(in seconds) - arrival time)
+		System.out.println("Turnaround time: " + tat_time + " milliseconds.");
+		System.out.println("Waiting time: " + wait_time + " milliseconds.");
 		sched.releaseMemory(finishedJob);
+		totalTurnaround += tat_time;
+		totalWaitTime += wait_time;
+		jobsProcessed++;
 	}
 	
 	public static void J_DISPATCH(String arrivingJob)
@@ -33,7 +50,6 @@ public class OSP1
 		try
 		{
 			Thread.sleep(Integer.parseInt(dispatch_tokens[4]));
-			System.out.println("Nigga we S C H L E E P");
 			J_TERM(arrivingJob);
 		}
 		catch(Exception ex)
@@ -61,17 +77,17 @@ public class OSP1
 			FileReader fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			
-			for(int i = 0; i < 2000; i++) //May come into contact with an infinite loop bug when doing the 'while' conversion - be aware.
+			while((line = bufferedReader.readLine()) != null)
 			{
-				if((line = bufferedReader.readLine()) != null)
-				{
+				
 					StringBuffer appendArrivalTime = new StringBuffer(line);
-					appendArrivalTime.append("	" + date.getSeconds());
+					appendArrivalTime.append("	" + date.getTime());
 					line = appendArrivalTime.toString(); //appends arrival time to incoming job
 					if(disk.isEmpty() == false)
 					{
-						if(disk.size() == 300)
+						if(disk.size() == 300) //If disk is full, proceeds to empty the ready queue to offload jobs from disk
 						{
+							System.out.println("THIS DISK IS ONE THICC BIH");
 							for(int k = 0; k < readyQueue.size(); k++)
 							{
 								J_DISPATCH(readyQueue.take());
@@ -85,7 +101,7 @@ public class OSP1
 								{
 									StringBuffer appendLoadTime = new StringBuffer(disk.element());
 									String tempItem;
-									appendLoadTime.append("	" + date.getSeconds());
+									appendLoadTime.append("	" + date.getTime());
 									tempItem = appendLoadTime.toString();
 									readyQueue.add(tempItem);
 									disk.take();
@@ -99,14 +115,12 @@ public class OSP1
 					
 					if(readyQueue.size() == qCONSTRAINT) //Checks if the ready queue is full. If it is, calls J_DISPATCH to run.
 					{
-						System.out.println("Queue is full, so we're ceasing activity to run J_DISPATCH");
 						J_DISPATCH(readyQueue.take());
 						continue;
 					}
 					
 					if(sched.idCheck(line)) //checks if job id is 0, if so then fills ready queue from disk and calls J_DISPATCH to run.
 					{
-						System.out.println("0 encountered, so we're loading everything from the disk and running it until we get some new jobs");
 						for(int j = 0; j < qCONSTRAINT; j++)
 						{
 							if(sched.aquireMemoryCheck(disk.element()))
@@ -119,7 +133,7 @@ public class OSP1
 								else
 								{
 									StringBuffer appendLoadTime = new StringBuffer(disk.element());
-									appendLoadTime.append("	" + date.getSeconds());
+									appendLoadTime.append("	" + date.getTime());
 									if(readyQueue.size() == qCONSTRAINT)
 									{
 										for(int k = 0; k < readyQueue.size(); k++)
@@ -140,10 +154,10 @@ public class OSP1
 						J_DISPATCH(readyQueue.take());
 						continue;
 					}
-					if(sched.aquireMemoryCheck(line))
+					if(sched.aquireMemoryCheck(line)) //Standard memory check/allocation for an incoming job
 					{
 						StringBuffer appendLoadTime = new StringBuffer(line);
-						appendLoadTime.append("	" + date.getSeconds());
+						appendLoadTime.append("	" + date.getTime());
 						line = appendLoadTime.toString(); //appends load time to incoming job
 						readyQueue.add(line);
 					}
@@ -159,9 +173,14 @@ public class OSP1
 							disk.add(line);
 						}
 					}
-				}
 			}
 			bufferedReader.close();
+			
+			while(readyQueue.isEmpty() == false) //Empties ready queue after job input has ceased
+			{
+					J_DISPATCH(readyQueue.take());
+			}
+			
 		}
 		catch(FileNotFoundException ex)
 		{
@@ -175,15 +194,14 @@ public class OSP1
 		{
 			ex.printStackTrace(System.out);
 		}
-		
-		/*if(readyQueue.isEmpty() == false)
-		{
-			for(int i = 0; i < readyQueue.size(); i++)
-			{
-				J_DISPATCH(readyQueue.take());
-			}
-		}*/
 		System.out.println("\nThe number of items entered into the disk is: " + count);
 		System.out.println("The number of items entered into the ready queue is " + readyQueue.size());
+		System.out.println("Number of jobs processed: " + jobsProcessed);
+		System.out.println("Number of CPU-bound jobs: " + cpuJobCount);
+		System.out.println("Number of Balanced jobs: " + balancedJobCount);
+		System.out.println("Number of IO-bound jobs: " + ioJobCount);
+		System.out.println("Average turnaround time: " + (totalTurnaround/jobsProcessed) + " milliseconds.");
+		System.out.println("Average wait time: " + Math.abs(totalWaitTime/jobsProcessed) + " milliseconds.");
+		System.out.println("Time of program termination: " + date.getTime());
 	}
 }
