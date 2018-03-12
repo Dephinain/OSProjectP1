@@ -1,22 +1,29 @@
+/*
+	This is the mem_manager subprogram. This subprogram checks whether or not any job currently being vetted by J_SCHED can actually be placed in memory, using the alloted memory granted to it by J_SCHED.
+	Memory regions are abstracted from the documentation as a jagged array of booleans for ease of use. Memory regions are allocated by a series of if statements that runs a check on the incoming job's memory requirements as according to the project documentation. (EG - '4 regions of size 8k, 1 region of size 52k', etc.)
+	A similar method is used when a job is terminating, and that same memory region has to be deallocated for future use.
+	
+	Possible Improvement: For simply checking which memory bit goes where, its a very long program. I do recall that a bitmap could be used in place of using if statements, but I was making fast and stable progress on the assignment with this method. In the future, I may revamp how the program checks memory so I can cut down on the size of this sub program.
+*/
 import java.io.*;
 import java.util.*;
 
 public class mem_manager
 {
-	public static boolean[][] workingArray;
+	public static boolean[][] workingArray; //This is the 'memory' for the system - a jagged 2D array of booleans created using the parameters outlined in the assignment documentation.
 	
 	public mem_manager()
 	{
 	};
 	
-	public mem_manager(boolean[][] input)
+	public mem_manager(boolean[][] input) //
 	{
 		this.workingArray = input;
 	};
 	
-	public static boolean aquire(int memoryNeed)
+	public static boolean aquire(int memoryNeed) //aquire is the method utilized when the scheduler is checking for memory availability
 	{
-		if(memoryNeed == 0)
+		if(memoryNeed == 0) //memoryNeed is the memory requested by the job currently being scheduled
 		{
 			return false;
 		}
@@ -118,7 +125,7 @@ public class mem_manager
 		return false;
 	};
 	
-	public static boolean release(int memoryNeed)
+	public static boolean release(int memoryNeed) //release is the method called when the job has been terminated, and the memory its using has to be released for other incoming jobs.
 	{
 		if(memoryNeed <= 8)
 		{
@@ -215,7 +222,7 @@ public class mem_manager
 		}
 		return false;
 	}
-	public static boolean memoryAllowed(int memoryNeed)
+	public static boolean memoryAllowed(int memoryNeed) //This method checks if a job's memory requirements are larger than any of the currently available slots. If so, tells the scheduler to boot it out the system.
 	{
 		if(memoryNeed > 128)
 		{
