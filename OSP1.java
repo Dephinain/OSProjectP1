@@ -14,8 +14,10 @@ Global Variables: J_SCHED sched - this is the job scheduler class that properly 
 				  totalProcess - Counts how many processes have been run
 				  qCONSTRAINT - The hardcap on memory availability
 				  
-File description: Main protocol for the scheduler, takes input from the incoming job file and calls appropriate methods and functions (J_SCHED, J_DISPATCH, J_TERM) according to input
-Possible improvements: <to be added, but lord almighty is this definitely not perfect>
+File description: Main protocol for the scheduler, takes input from the incoming job file and calls appropriate methods and functions (J_SCHED, J_DISPATCH, J_TERM) according to input.
+
+Possible improvements: A pretty bad way of handling the 0 jobs that got loaded to disk and subsequently memory/execution. Checks built in for such a thing don't work properly, and
+would require more time than alloted to fix.
 				  
 */
 
@@ -43,11 +45,10 @@ public class OSP1
 		term_tokens = finishedJob.split("\\s+"); //Tokenizes terminating job string
 		if(Integer.parseInt(term_tokens[1]) == 0)
 		{
-			System.out.println("Bad value got through.");
 		}
 		else
 		{
-			tat_time = term_time - Long.parseLong(term_tokens[4]) - Long.parseLong(term_tokens[5]);
+			tat_time = term_time - Math.abs(Long.parseLong(term_tokens[4]) - Long.parseLong(term_tokens[5]));
 			wait_time = term_time - Long.parseLong(term_tokens[5]);
 			if(Integer.parseInt(term_tokens[2]) == 1)
 				cpuJobCount++;
@@ -56,7 +57,7 @@ public class OSP1
 			else if(Integer.parseInt(term_tokens[2]) == 3)
 				ioJobCount++;
 		
-			//Entire following brick outputs individual job statistics
+			//Output of individual job statistics.
 			System.out.println("\nJob stats: ");
 			System.out.println("Job ID: " + term_tokens[1]);
 			System.out.println("Class of Job: " + term_tokens[2]);
@@ -92,8 +93,8 @@ public class OSP1
 	
 	public static void main(String[] args)
 	{
-		//File file = new File("//home//opsys//OS-I//18sp-jobs"); Line used for CSX reading the file, other line is for testing on local machines
-		File file = new File("18sp-jobs"); //Incoming job file
+		File file = new File("/home/opsys/OS-I/18Sp-jobs");
+		//File file = new File("18sp-jobs"); 
 		String line; //Line that holds incoming job to be checked
 		BlockingQueue<String> readyQueue = new ArrayBlockingQueue<String>(qCONSTRAINT); //Ready queue initialized with the constraint
 		BlockingQueue<String> disk = new ArrayBlockingQueue<String>(300); //Disk initialized with the constraint given by the assignment documentation
@@ -191,18 +192,18 @@ public class OSP1
 						J_DISPATCH(readyQueue.take());
 						continue;
 					}
-					if(sched.aquireMemoryCheck(line)) //Standard memory check/allocation for an incoming job
+					if(sched.aquireMemoryCheck(line)) //If the above checks are passed, then this runs to simply input the job into the ready queue (if it is able).
 					{
 						StringBuffer appendLoadTime = new StringBuffer(line);
 						appendLoadTime.append("	" + date.getTime());
-						line = appendLoadTime.toString(); //appends load time to incoming job
+						line = appendLoadTime.toString(); 
 						readyQueue.add(line);
 					}
 					else
 					{
 						String[] check_tokens;
 						check_tokens = line.split("\\s+");
-						if(sched.sizeCheck(Integer.parseInt(check_tokens[3])) == false)
+						if(sched.sizeCheck(Integer.parseInt(check_tokens[3])) == false) //Checks if memory requested is outside constraints.
 						{
 							rejectCount++;
 							continue;
@@ -215,7 +216,7 @@ public class OSP1
 			}
 			bufferedReader.close();
 			
-			while(disk.isEmpty() == false) //Empties disk after job input has ceased
+			while(disk.isEmpty() == false) //Empties disk after job input has ceased.
 			{
 				String arrival, loaded;
 				StringBuffer appendArrivalTime = new StringBuffer(disk.take());
@@ -235,7 +236,7 @@ public class OSP1
 				}
 			}
 			
-			while(readyQueue.isEmpty() == false) //Empties ready queue after job input has ceased
+			while(readyQueue.isEmpty() == false) //Empties ready queue after job input has ceased.
 			{
 					J_DISPATCH(readyQueue.take());
 			}
@@ -253,14 +254,14 @@ public class OSP1
 		{
 			ex.printStackTrace(System.out);
 		}
-		System.out.println("\nThe number of items entered into the disk is: " + disk.size());
-		System.out.println("The number of items entered into the ready queue is " + readyQueue.size());
+		
+		//Final output.
 		System.out.println("\nNumber of jobs processed: " + jobsProcessed);
 		System.out.println("Number of CPU-bound jobs: " + cpuJobCount);
 		System.out.println("Number of Balanced jobs: " + balancedJobCount);
 		System.out.println("Number of IO-bound jobs: " + ioJobCount);
 		System.out.println("Average turnaround time: " + (totalTurnaround/jobsProcessed) + " milliseconds.");
-		System.out.println("Average wait time: " + Math.abs(totalWaitTime/jobsProcessed) + " milliseconds.");
+		System.out.println("Average wait time: " + (totalWaitTime/jobsProcessed) + " milliseconds.");
 		System.out.println("Number of rejected jobs: " + rejectCount);
 		System.out.println("Total processing time of CPU clock: " + totalProcess);
 	}

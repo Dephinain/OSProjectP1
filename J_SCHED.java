@@ -27,10 +27,10 @@ public class J_SCHED
 			memoryArr[6] = new boolean[1];
 			initialize(memoryArr);
 		};
-		
+		//Note: tokens[1-6] represent the following: Job ID(1), class of Job(2), requested memory(3), processing time(4), arrival time(5), time job was loaded to ready queue(6).
 		private static mem_manager manager = new mem_manager(memoryArr);
 		
-		public static boolean aquireMemoryCheck(String inputLine) //Note: tokens[1-6] represent the following: Job ID(1), class of Job(2), requested memory(3), processing time(4), arrival time(5), time job was loaded to ready queue(6).
+		public static boolean aquireMemoryCheck(String inputLine)
 		{
 			String[] tokens;
 			tokens = inputLine.split("\\s+");	
@@ -59,7 +59,9 @@ public class J_SCHED
 			String[] tokens;
 			tokens = inputLine.split("\\s+");
 			if(Integer.parseInt(tokens[1]) == 0)
+			{
 				return true;
+			}
 			else
 				return false;
 		}

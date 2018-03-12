@@ -16,16 +16,19 @@ public class mem_manager
 	
 	public static boolean aquire(int memoryNeed)
 	{
-		if(memoryNeed <= 8)
+		if(memoryNeed == 0)
+		{
+			return false;
+		}
+
+		if((memoryNeed >= 1) && (memoryNeed <= 8))
 		{
 			for(int i = 0; i < workingArray[0].length; i++)
 			{
 				if(workingArray[0][i] == true)
 				{
-					//System.out.println("LEG DAY");
 					workingArray[0][i] = false;
 					return true;
-					//break;
 				}
 				else if(workingArray[0][i] == false)
 					continue;
@@ -37,10 +40,8 @@ public class mem_manager
 			{
 				if(workingArray[1][i] == true)
 				{
-					//System.out.println("SEND ME HELP");
 					workingArray[1][i] = false;
 					return true;
-					//break;
 				}
 				else
 				{
@@ -54,10 +55,8 @@ public class mem_manager
 			{
 				if(workingArray[2][i] == true)
 				{
-					//System.out.println("YERR");
 					workingArray[2][i] = false;
 					return true;
-					//break;
 				}
 				else
 					continue;
@@ -69,22 +68,19 @@ public class mem_manager
 			{
 				if(workingArray[3][i] == true)
 				{
-					//System.out.println("YEET");
 					workingArray[3][i] = false;
 					return true;
-					//break;
 				}
 				else
 					continue;
 			}
 		}
-		else if((memoryNeed > 32) && (memoryNeed <= 52)) //Only has one slot - may need a stronger yes/no
+		else if((memoryNeed > 32) && (memoryNeed <= 52))
 		{
 			for(int i = 0; i < workingArray[4].length; i++)
 			{
 				if(workingArray[4][i] == true)
 				{
-					//System.out.println("TWERK");
 					workingArray[4][i] = false;
 					return true;
 				}
@@ -98,7 +94,6 @@ public class mem_manager
 			{
 				if(workingArray[5][i] == true)
 				{
-					//System.out.println("SOMETHING");
 					workingArray[5][i] = false;
 					return true;
 				}
@@ -112,7 +107,6 @@ public class mem_manager
 			{
 				if(workingArray[6][i] == true)
 				{
-					//System.out.println("SPECIAL");
 					workingArray[6][i] = false;
 					return true;
 				}
@@ -132,10 +126,8 @@ public class mem_manager
 			{
 				if(workingArray[0][i] == false)
 				{
-					//System.out.println("Day leg");
 					workingArray[0][i] = true;
 					return true;
-					//break;
 				}
 				else if(workingArray[0][i] == true)
 					continue;
@@ -147,10 +139,8 @@ public class mem_manager
 			{
 				if(workingArray[1][i] == false)
 				{
-					//System.out.println("Sending you help");
 					workingArray[1][i] = true;
 					return true;
-					//break;
 				}
 				else
 				{
@@ -164,10 +154,8 @@ public class mem_manager
 			{
 				if(workingArray[2][i] == false)
 				{
-					//System.out.println("Rey");
 					workingArray[2][i] = true;
 					return true;
-					//break;
 				}
 				else
 					continue;
@@ -179,7 +167,6 @@ public class mem_manager
 			{
 				if(workingArray[3][i] == false)
 				{
-					//System.out.println("Caution");
 					workingArray[3][i] = true;
 					return true;
 				}
@@ -187,13 +174,12 @@ public class mem_manager
 					continue;
 			}
 		}
-		else if((memoryNeed > 32) && (memoryNeed <= 52)) //Only has one slot - may need a stronger yes/no
+		else if((memoryNeed > 32) && (memoryNeed <= 52))
 		{
 			for(int i = 0; i < workingArray[4].length; i++)
 			{
 				if(workingArray[4][i] == false)
 				{
-					//System.out.println("Square dance");
 					workingArray[4][i] = true;
 					return true;
 				}
@@ -207,7 +193,6 @@ public class mem_manager
 			{
 				if(workingArray[5][i] == false)
 				{
-					//System.out.println("Nothing");
 					workingArray[5][i] = true;
 					return true;
 				}
@@ -221,7 +206,6 @@ public class mem_manager
 			{
 				if(workingArray[6][i] == false)
 				{
-					//System.out.println("Ordinary");
 					workingArray[6][i] = true;
 					return true;
 				}
@@ -235,7 +219,6 @@ public class mem_manager
 	{
 		if(memoryNeed > 128)
 		{
-			//System.out.println("A job is gettin the boot!" + memoryNeed);
 			return false;
 		}
 		else
