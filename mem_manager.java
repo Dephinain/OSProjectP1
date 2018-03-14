@@ -226,9 +226,15 @@ public class mem_manager
 	{
 		if(memoryNeed > 128)
 		{
-			return false;
+			return true;
 		}
 		else
-			return true;
+		{
+			return false;
+		}
+	}
+	
+	public static void main(String[] args)
+	{
 	}
 }

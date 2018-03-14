@@ -68,7 +68,7 @@ public class J_SCHED
 		{
 			String[] tokens;
 			tokens = inputLine.split("\\s+");
-			if(Integer.parseInt(tokens[1]) == 0)
+			if(Integer.parseInt(tokens[1]) != 0)
 			{
 				return true;
 			}
@@ -76,12 +76,14 @@ public class J_SCHED
 				return false;
 		}
 		
-		public static boolean sizeCheck(int input) //Checks with mem_manager to see if the size of the job will fit within the alloted memory regions.
+		public static boolean sizeCheck(String input) //Checks with mem_manager to see if the size of the job will fit within the alloted memory regions.
 		{
-			if((manager.memoryAllowed(input)) == false)
-				return false;
-			else
+			String[] check_tokens;
+			check_tokens = input.split("\\s+");
+			if((manager.memoryAllowed(Integer.parseInt(check_tokens[3]))) == true)
 				return true;
+			else
+				return false;
 		}
 		public static void main(String[] args)
 		{
